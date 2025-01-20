@@ -1,5 +1,10 @@
 # audiovasion
-A web game using only audio
+A web game using only audio.
+
+Hosted on GitHub Pages at: 
+
+https://luketn.github.io/audiovasion/
+
 
 Using some audio assets from ZapSplat. 
 Attribution to:
