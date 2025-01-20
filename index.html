@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <body>
-<audio src="beep-tight.mp3" crossorigin="anonymous" loop></audio>
+<audio id="beep" src="beep-tight.mp3" crossorigin="anonymous" loop></audio>
+<audio id="explode" src="explode.mp3" crossorigin="anonymous"></audio>
 <script type="text/javascript">
     // instigate our audio context
     let audioCtx;
+
     // load some sound
-    const audioElement = document.querySelector("audio");
+    const audioElement = document.getElementById("beep");
+    const explodeAudioElement = document.getElementById("explode");
+
     let track;
 
     const body = document.querySelector("body");
@@ -17,20 +21,27 @@
     body.addEventListener(
         "keyup",
         (event) => {
-            if (event.code === "Space") {
-                // prevent the default action (scroll / move caret)
-                event.preventDefault();
+            switch (event.code) {
+                case "Space": {
+                    // prevent the default action (scroll / move caret)
+                    event.preventDefault();
 
-                if (!audioCtx) {
-                    init();
+                    if (!audioCtx) {
+                        init();
+                    }
+
+                    // check if context is in suspended state (autoplay policy)
+                    if (audioCtx.state === "suspended") {
+                        audioCtx.resume();
+                    }
+
+                    togglePlay();
+                    break;
                 }
-
-                // check if context is in suspended state (autoplay policy)
-                if (audioCtx.state === "suspended") {
-                    audioCtx.resume();
+                case "KeyE": {
+                    explodeAudioElement.play();
+                    break;
                 }
-
-                togglePlay();
             }
         },
         false
