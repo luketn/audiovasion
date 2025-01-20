@@ -1,44 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <body>
+<audio src="beep-tight.mp3" crossorigin="anonymous" loop></audio>
 <script type="text/javascript">
-    console.clear();
-
     // instigate our audio context
     let audioCtx;
-
     // load some sound
     const audioElement = document.querySelector("audio");
     let track;
 
-    const playButton = document.querySelector(".tape-controls-play");
+    const body = document.querySelector("body");
+
+    let isPlaying = false;
 
     // play pause audio
-    playButton.addEventListener(
-        "click",
-        () => {
-            if (!audioCtx) {
-                init();
-            }
+    body.addEventListener(
+        "keyup",
+        (event) => {
+            if (event.code === "Space") {
+                // prevent the default action (scroll / move caret)
+                event.preventDefault();
 
-            // check if context is in suspended state (autoplay policy)
-            if (audioCtx.state === "suspended") {
-                audioCtx.resume();
-            }
+                if (!audioCtx) {
+                    init();
+                }
 
-            if (playButton.dataset.playing === "false") {
-                audioElement.play();
-                playButton.dataset.playing = "true";
-                // if track is playing pause it
-            } else if (playButton.dataset.playing === "true") {
-                audioElement.pause();
-                playButton.dataset.playing = "false";
-            }
+                // check if context is in suspended state (autoplay policy)
+                if (audioCtx.state === "suspended") {
+                    audioCtx.resume();
+                }
 
-            // Toggle the state between play and not playing
-            let state =
-                playButton.getAttribute("aria-checked") === "true" ? true : false;
-            playButton.setAttribute("aria-checked", state ? "false" : "true");
+                togglePlay();
+            }
         },
         false
     );
@@ -47,11 +40,20 @@
     audioElement.addEventListener(
         "ended",
         () => {
-            playButton.dataset.playing = "false";
-            playButton.setAttribute("aria-checked", "false");
+            // think about what to do.
         },
         false
     );
+
+    function togglePlay() {
+        if (isPlaying) {
+            audioElement.pause();
+            isPlaying = false;
+        } else {
+            audioElement.play();
+            isPlaying = true;
+        }
+    }
 
     function init() {
         audioCtx = new AudioContext();
@@ -62,32 +64,31 @@
         // Create the node that controls the volume.
         const gainNode = new GainNode(audioCtx);
 
-        const volumeControl = document.querySelector('[data-action="volume"]');
-        volumeControl.addEventListener(
-            "input",
-            () => {
-                gainNode.gain.value = volumeControl.value;
-            },
-            false
-        );
+        // const volumeControl = document.querySelector('[data-action="volume"]');
+        // volumeControl.addEventListener(
+        //     "input",
+        //     () => {
+        //         gainNode.gain.value = volumeControl.value;
+        //     },
+        //     false
+        // );
 
         // Create the node that controls the panning
         const panner = new StereoPannerNode(audioCtx, { pan: 0 });
 
-        const pannerControl = document.querySelector('[data-action="panner"]');
-        pannerControl.addEventListener(
-            "input",
-            () => {
-                panner.pan.value = pannerControl.value;
-            },
-            false
-        );
+        // const pannerControl = document.querySelector('[data-action="panner"]');
+        // pannerControl.addEventListener(
+        //     "input",
+        //     () => {
+        //         panner.pan.value = pannerControl.value;
+        //     },
+        //     false
+        // );
 
         // connect our graph
         track.connect(gainNode).connect(panner).connect(audioCtx.destination);
     }
 
-    // Track credit: Outfoxing the Fox by Kevin MacLeod under Creative Commons
 </script>
 </body>
 </html>
